@@ -80,9 +80,9 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y openjdk-11-jdk
-          wget https://downloads.apache.org//jmeter/binaries/apache-jmeter-5.4.3.tgz
-          tar -xvzf apache-jmeter-5.4.3.tgz
-          sudo mv apache-jmeter-5.4.3 /opt/jmeter
+          wget https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-5.6.3.tgz
+          tar -xvzf apache-jmeter-5.6.3.tgz
+          sudo mv apache-jmeter-5.6.3 /opt/jmeter
           export PATH=$PATH:/opt/jmeter/bin
 
       - name: Run Load Tests with JMeter

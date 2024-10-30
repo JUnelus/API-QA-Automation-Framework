@@ -83,7 +83,10 @@ jobs:
           wget https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-5.6.3.tgz
           tar -xvzf apache-jmeter-5.6.3.tgz
           sudo mv apache-jmeter-5.6.3 /opt/jmeter
-          export PATH=$PATH:/opt/jmeter/bin
+        shell: bash
+
+      - name: Add JMeter to PATH
+        run: echo "/opt/jmeter/bin" >> $GITHUB_PATH
 
       - name: Run Load Tests with JMeter
         run: |

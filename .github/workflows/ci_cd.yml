@@ -1,0 +1,87 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      # Start up a PostgreSQL service (or SQLite if testing locally)
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpass
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U testuser -d testdb"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Database Migrations
+        env:
+          DATABASE_URL: postgresql://testuser:testpass@localhost:5432/testdb
+        run: |
+          python -c 'from app import db; db.create_all()'
+
+      - name: Run API Tests with Pytest
+        env:
+          DATABASE_URL: postgresql://testuser:testpass@localhost:5432/testdb
+        run: pytest test_scripts/test_api.py
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-results
+          path: test_results/
+
+  load_test:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up JMeter
+        run: |
+          sudo apt update
+          sudo apt install -y openjdk-11-jdk
+          wget https://downloads.apache.org//jmeter/binaries/apache-jmeter-5.4.3.tgz
+          tar -xvzf apache-jmeter-5.4.3.tgz
+          sudo mv apache-jmeter-5.4.3 /opt/jmeter
+          export PATH=$PATH:/opt/jmeter/bin
+
+      - name: Run Load Tests with JMeter
+        run: |
+          jmeter -n -t load_tests/load_test_plan.jmx -l test_results/jmeter_results.jtl
+
+      - name: Upload JMeter Results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: jmeter-results
+          path: test_results/jmeter_results.jtl

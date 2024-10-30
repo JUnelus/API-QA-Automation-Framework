@@ -27,6 +27,7 @@ api-testing-framework
 - PostgreSQL (if using a database other than SQLite)
 - JMeter (optional, for local load testing)
 - GitHub account for CI/CD
+![img_1.png](screenshots/img_1.png)
 
 ### Installation
 
@@ -48,6 +49,7 @@ api-testing-framework
     python app.py
     ```
    The API should be available at `http://127.0.0.1:5000`.
+![img.png](screenshots/img_2.png)
 
 ### Running Tests
 
@@ -73,6 +75,7 @@ Push any changes to GitHub to automatically trigger the CI/CD pipeline. The pipe
 
 1. Run the functional tests with pytest.
 2. Execute JMeter load tests (if configured).
+![img.png](screenshots/img.png)
 
 ## Configuration
 

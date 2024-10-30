@@ -44,7 +44,7 @@ jobs:
         env:
           DATABASE_URL: postgresql://testuser:testpass@localhost:5432/testdb
         run: |
-          python -c 'from app import db; db.create_all()'
+          python -c 'from app import app, db; app.app_context().push(); db.create_all()'
 
       - name: Run API Tests with Pytest
         env:

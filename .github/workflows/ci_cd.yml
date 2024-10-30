@@ -11,7 +11,6 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      # Start up a PostgreSQL service (or SQLite if testing locally)
       postgres:
         image: postgres:13
         env:
@@ -45,6 +44,17 @@ jobs:
           DATABASE_URL: postgresql://testuser:testpass@localhost:5432/testdb
         run: |
           python -c 'from app import app, db; app.app_context().push(); db.create_all()'
+
+      - name: Start Flask App
+        env:
+          DATABASE_URL: postgresql://testuser:testpass@localhost:5432/testdb
+        run: |
+          nohup python -m flask run --host=0.0.0.0 &
+        shell: bash
+
+      - name: Wait for Flask App to Start
+        run: |
+          sleep 5
 
       - name: Run API Tests with Pytest
         env:
